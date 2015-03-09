@@ -33,6 +33,7 @@ action :add do
     cmd << " /applicationPool:\"#{new_resource.application_pool}\"" if new_resource.application_pool
     cmd << " /physicalPath:\"#{windows_cleanpath(new_resource.physical_path)}\"" if new_resource.physical_path
     cmd << " /enabledProtocols:\"#{new_resource.enabled_protocols}\"" if new_resource.enabled_protocols
+    cmd << " /preloadEnabled:#{new_resource.preload_enabled}" if new_resource.preload_enabled
     Chef::Log.debug(cmd)
     shell_out!(cmd)
     new_resource.updated_by_last_action(true)
@@ -54,17 +55,21 @@ action :config do
     is_new_application_pool = is_new_or_empty_value?(doc.root, "APP/application/@applicationPool", new_resource.application_pool.to_s)
     is_new_enabled_protocols = is_new_or_empty_value?(doc.root, "APP/application/@enabledProtocols", new_resource.enabled_protocols.to_s)
     is_new_physical_path = is_new_or_empty_value?(doc.root, "APP/application/virtualDirectory/@physicalPath", new_resource.physical_path.to_s)
+    is_new_preload_enabled = is_new_or_empty_value?(doc.root, "APP/application/@preloadEnabled", new_resource.preload_enabled)
 
     #only get the beginning of the command if there is something that changeds
     cmd = "#{appcmd(node)} set app \"#{site_identifier}\"" if ((new_resource.path && is_new_path) or
                                                         (new_resource.application_pool && is_new_application_pool) or
-                                                        (new_resource.enabled_protocols && is_new_enabled_protocols))
+                                                        (new_resource.enabled_protocols && is_new_enabled_protocols) or
+                                                        is_new_preload_enabled)
     #adds path to the cmd
     cmd << " /path:\"#{new_resource.path}\"" if new_resource.path && is_new_path
     #adds applicationPool to the cmd
     cmd << " /applicationPool:\"#{new_resource.application_pool}\"" if new_resource.application_pool && is_new_application_pool
     #adds enabledProtocols to the cmd
     cmd << " /enabledProtocols:\"#{new_resource.enabled_protocols}\"" if new_resource.enabled_protocols && is_new_enabled_protocols
+    #adds preloadEnabled to the cmd
+    cmd << " /preloadEnabled:\"#{new_resource.preload_enabled}\"" if is_new_preload_enabled
     Chef::Log.debug(cmd)
     
     if(cmd == nil)
