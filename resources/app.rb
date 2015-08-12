@@ -29,4 +29,5 @@ attribute :enabled_protocols, kind_of: String
 attribute :default_documents, kind_of: Array, default: []
 attribute :mime_maps, kind_of: Array, default: []
 
+attribute :preload_enabled, :kind_of => [TrueClass, FalseClass], :default => false
 attr_accessor :exists, :running
