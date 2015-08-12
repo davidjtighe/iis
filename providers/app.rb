@@ -56,7 +56,7 @@ action :config do
     is_new_application_pool = new_or_empty_value?(doc.root, 'APP/application/@applicationPool', new_resource.application_pool.to_s)
     is_new_enabled_protocols = new_or_empty_value?(doc.root, 'APP/application/@enabledProtocols', new_resource.enabled_protocols.to_s)
     is_new_physical_path = new_or_empty_value?(doc.root, 'APP/application/virtualDirectory/@physicalPath', new_resource.physical_path.to_s)
-    is_new_preload_enabled = is_new_or_empty_value?(doc.root, "APP/application/@preloadEnabled", new_resource.preload_enabled)
+    is_new_preload_enabled = new_or_empty_value?(doc.root, "APP/application/@preloadEnabled", new_resource.preload_enabled)
 
     # only get the beginning of the command if there is something that changeds
     cmd = "#{appcmd(node)} set app \"#{site_identifier}\"" if ((new_resource.path && is_new_path) ||
